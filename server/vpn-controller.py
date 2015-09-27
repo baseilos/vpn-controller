@@ -4,13 +4,13 @@ import json
 
 app = flask.Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def hello():
-	return "Hello World"
+	return app.send_static_file('vpn-controller.html')
 
 # ---------------- vpn-list ----------------
 
-@app.route("/vpn-list")
+@app.route("/vpn-list", methods=['GET'])
 def get_vpn_list_handler():
 	try:
 		return construct_vpn_list_response(parse_vpn_list(get_vpn_data()))
@@ -35,7 +35,7 @@ def construct_vpn_list_response(vpn_map):
 
 # ---------------- switch-vpn ----------------
 
-@app.route("/switch-vpn/<vpn_name>")
+@app.route("/switch-vpn/<vpn_name>", methods=['GET'])
 def switch_vpn_handler(vpn_name):
 	try:
 		if not vpn_exists(vpn_name):
@@ -64,7 +64,7 @@ def vpn_exists(vpn):
 # ---------------- os integration ----------------
 
 def get_vpn_data():
-	return subprocess.check_output('sh scripts/parse-vpn-list.sh', shell=True)
+	return subprocess.check_output('sh scripts/get-vpn-data.sh', shell=True)
 
 def stop_all_vpn():
 	subprocess.check_output('sh scripts/stop-vpn.sh', shell=True)
@@ -79,12 +79,12 @@ def construct_response(data_name, data):
 	json_response = {}
 	json_response['ok'] = 1
 	json_response[data_name] = data
-	return flask.Response(json.dumps(json_response), mimetype='application/json')
+	return flask.Response(json.dumps(json_response), content_type='application/json;charset=utf-8')
 
 def construct_error_response(error_message):
-	return flask.Response(json.dumps({'ok': 0, 'error': error_message}), mimetype='application/json')
+	return flask.Response(json.dumps({'ok': 0, 'error': error_message}), content_type='application/json;charset=utf-8')
 
 # -----------------
 
 if __name__ == "__main__":
-	app.run(debug=True);
+	app.run(host='0.0.0.0', debug=True);

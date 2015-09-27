@@ -1,4 +1,4 @@
-!#/bin/sh
+#!/bin/sh
 
 cd `dirname $0`
 VPN_NAME=$1

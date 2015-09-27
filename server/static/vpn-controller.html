@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="VPN controller" />
+		<meta name="author" content="Jozef Lang" />
+
+		<title>VPN controller</title>
+	</head>
+	<body>
+		<div id="vpn-list">
+		</div>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript">
+
+			function generateVPNList(where, vpnList) {
+				var objul = $('<ul></ul>');
+				$.each(vpnList, function(index, vpn) {
+					var obja = vpn['is_running'] == 0 ? $("<a href=\"#\" class=\"vpn-link\" rel=\"" + vpn['name'] + "\"></a>") : $("<span></span>");
+					obja.text(vpn['name']);
+					var objli = $('<li></li>');
+					objli.append(obja);
+					objul.append(objli);	
+				});
+				where.html(objul);	
+			}
+
+			function processResponse(data) {
+				if (data['ok'] == 0) {
+						alert('Error!');
+					} else {
+						generateVPNList($('#vpn-list'), data['vpn_list']);
+					};
+			}
+
+			$('#vpn-list').on('click', '.vpn-link', function() {
+				var vpn = $(this).attr('rel');
+				$.getJSON("/switch-vpn/" + vpn, function(data) {
+					processResponse(data);
+				});
+			});
+
+			$(function() {
+				$.getJSON("/vpn-list", function(data) {
+					processResponse(data);
+				});
+			}); 
+		</script>				
+	</body>
+</html>
