@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd `dirname $0`
-service openvpn stop
+sudo service openvpn stop

@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import subprocess
 import flask
 import json
